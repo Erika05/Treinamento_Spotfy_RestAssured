@@ -149,6 +149,7 @@ public class teste {
 //        json.put("x", "s");
 //        String x = json.toString();
 //        buscaPlayList();
+//          verificaPorName(nomeMusciaProcura);
 //        response = given()
 //                .accept("application/json")
 //                .contentType("application/json")
