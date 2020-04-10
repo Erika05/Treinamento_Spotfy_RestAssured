@@ -1,0 +1,13 @@
+/node_modules
+/node
+/npm
+/target
+/TestReport
+*.idea
+
+# Log file
+*.log
+/public
+
+
+
