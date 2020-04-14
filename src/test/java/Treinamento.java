@@ -1,7 +1,6 @@
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import static io.restassured.RestAssured.given;
@@ -9,18 +8,20 @@ import static org.testng.Assert.*;
 
 public class Treinamento {
     public LerArquivoJson lerArquivoJson = new LerArquivoJson();
-    public static String token = "BQBzYApuisFDQMZbd8-eyQv8j1pj16diwROjHt0l6NEpXcpHQKnTwDDNQJ2G6c8I9P3fMIFESiSvjXVBASqIkaw759RlncWAPEQfE7BcXK1Lz0ve5k2ApaiL8fxm1wFHL5rFGE0H2iKgfRSlmGVMcn3VnMBQGhzSWUqGOYdUGtMuNfZ9Pj7IXkyHSiSVdha-Ju15_wYVnf6sEuzUphedp_ZWOrF8lCLWKA7qZCc9-HIK0scOidd9ZXXntYdC_-hnwCgu-lp6ist-ujpCiZGlBIHGQyKFvncRlWrBdA";
+    public static String token = "BQBbUgukBZ4i47HxJLky6ifyf1cSqsOUhjm4XYCqmZrXagxuzgfu4BGXxhlL899WBBLA6atDiHusgO0m111XqG3QV6FoWOT5e4fYRGEuTlt82gqslybdbD9LpQz6Lr435ztDtsfmGrwKi1QDsrHX3YOYvKTjqQFM4nOEz3LPSQANecX1V4uhvA34N0uJhmciPvuocsrIe1VHdhK1K54vWYImZJ1s2lOMmQpyvruwUd2cvcbvjuG6pkXE1_GRVkkgRHneB5Ia0TDX_nhJzppDG0Qf8brSTitGTRWrcw";
+    public static String idUsuario = "31y365smpy5c5zy52kgzv7jrjk44";
     public static String URL = "https://api.spotify.com/v1";
     public static  String nomeMuscia = "Please Mr. Postman";
     public static  String nomeMusciaProcura = "Please Mister Postman - Remastered 2009";
     public static  String nomePlayList = "Teste Postman";
+    public static  String nomeNovaPlayList = "Nova playList";
     public static String nameArtist = "The Marvelettes";
     public static  String nomePlayListAlteracao = "Teste Postman Novo";
     public static Response response;
     public static String idPlayList;
     public static String idNomeMusica;
     public static ArrayList  list;
-    public static int index = -1;
+    public static int index;
 
     @Test
     public void buscaPlayList()
@@ -160,7 +161,7 @@ public class Treinamento {
     @Test
     public void zalterarNomePlatList()
     {
-        buscaPlayList();
+            retornaIdPlayList(nomePlayList);
             response = given()
                     .accept("application/json")
                     .contentType("application/json")
@@ -180,6 +181,41 @@ public class Treinamento {
             } else {
                 System.out.println("Usuário não está logado!");
             }
+    }
+
+    @Test
+    public void buscaPlayListUsuario()
+    {
+        buscaPlayListUsuarioRequest();
+        if (response.statusCode() != 401) {
+            assertEquals(response.statusCode(), 200);
+            assertTrue(verificaPorName(nomePlayList));
+        } else {
+            System.out.println("Usuário não está logado!");
+        }
+    }
+
+    @Test
+    public void criarPlayListUsuario()
+    {
+        retornaIdPlayList(nomePlayList);
+        response = given()
+                .accept("application/json")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .body("{\"name\":\"" + nomeNovaPlayList + "\",\"description\":\"" + nomeNovaPlayList + "\",\"public\":false}")
+                .when()
+                .post(URL + "/users/" + idUsuario + "/playlists")
+                .then()
+                .extract()
+                .response();
+        if (response.statusCode() != 401) {
+            assertEquals(response.statusCode(), 201);
+            buscaPlayListUsuarioRequest();
+            assertTrue(verificaPorName(nomeNovaPlayList));
+        } else {
+            System.out.println("Usuário não está logado!");
+        }
     }
 
     public void buscaNomeMusicaRequest()
@@ -218,8 +254,26 @@ public class Treinamento {
         }
     }
 
+    public void buscaPlayListUsuarioRequest()
+    {
+        response = given()
+                .accept("application/json")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get(URL + "/users/" + idUsuario + "/playlists")
+                .then()
+                .extract()
+                .response();
+        if (response.statusCode() != 401) {;
+            list = response.path("items.name");
+        } else {
+            System.out.println("Usuário não está logado!");
+        }
+    }
+
     public Boolean verificaPorName(String nome) {
-        index = 0;
+        index = -1;
         for (int i = 0; i < list.size(); i++) {
             if(list.get(i).equals(nome))
             {
