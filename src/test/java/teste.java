@@ -194,6 +194,8 @@ public class teste {
 //        return false;
 //        }
 
+
+
 //    public Boolean verificaMusica(String nomeMuscia) {
 //        for (int i = 0; i < list.size(); i++) {
 //            if(list.get(i).equals(nomeMuscia))

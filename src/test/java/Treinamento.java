@@ -1,5 +1,5 @@
 import io.restassured.response.Response;
-import org.testng.Assert;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import java.io.File;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import static org.testng.Assert.*;
 
 public class Treinamento {
     public LerArquivoJson lerArquivoJson = new LerArquivoJson();
-    public static String token = "BQBbUgukBZ4i47HxJLky6ifyf1cSqsOUhjm4XYCqmZrXagxuzgfu4BGXxhlL899WBBLA6atDiHusgO0m111XqG3QV6FoWOT5e4fYRGEuTlt82gqslybdbD9LpQz6Lr435ztDtsfmGrwKi1QDsrHX3YOYvKTjqQFM4nOEz3LPSQANecX1V4uhvA34N0uJhmciPvuocsrIe1VHdhK1K54vWYImZJ1s2lOMmQpyvruwUd2cvcbvjuG6pkXE1_GRVkkgRHneB5Ia0TDX_nhJzppDG0Qf8brSTitGTRWrcw";
+    public static String token = "BQAoemv6becodF5KWpdtJRpRVE-ECgUQHfc0E8EpKnjyXzmcJNvRwynAmp6MqH9tKAOTJ9dZ-8T9xh-3tLLJIkXVJ_BgOQi1emK7hyvQ8t4AtqxmfAmwjNHksEmdP3NurYZAywPDGzB1cXli_c-rcX1Yis31Tt3ZY-Xh3RaUtZFYuQ5Cgqv6ZEzh8xqT2bwvdQ4RVHly9bZOlzFJySxMUu66J1Igu_4-B2YzNJxVlRkHEQ2plzUa6uY4JCuY2qw1czQ8nypdmugjuodMgcCwSjQEazfwt37O3y-o5g";
     public static String idUsuario = "31y365smpy5c5zy52kgzv7jrjk44";
     public static String URL = "https://api.spotify.com/v1";
     public static  String nomeMuscia = "Please Mr. Postman";
@@ -16,9 +16,13 @@ public class Treinamento {
     public static  String nomePlayList = "Teste Postman";
     public static  String nomeNovaPlayList = "Nova playList";
     public static String nameArtist = "The Marvelettes";
-    public static  String nomePlayListAlteracao = "Teste Postman Novo";
+    public static  String descricaoPlayListAlteracao = "Teste Postman Novo";
     public static Response response;
     public static String idPlayList;
+    public  static  String idMusicaPosicao;
+    public static String nomeMusicPaosicao;
+    public  static  String idMusicaPosicaoSegunda;
+    public static String nomeMusicPaosicaoSegunda;
     public static String idNomeMusica;
     public static ArrayList  list;
     public static int index;
@@ -28,7 +32,7 @@ public class Treinamento {
     {
         buscaPlayListRequest();
         if(response.statusCode() != 401) {
-            assertEquals(response.statusCode(), 200);
+            assertEquals(response.statusCode(), 200, "PlayList não encontrada!");
             assertTrue(verificaPorName(nomePlayList));
         }
         else
@@ -106,34 +110,6 @@ public class Treinamento {
         }
     }
 
-//    @Test
-//    public void adicionaMusicaArquivoJson() {
-//        File json = new File("src/arquivosJson/adicionarMusica.json");
-//        retornaIdMusica(nomePlayList, nomeMuscia);
-//        if(!verificaPorName(nomeMusciaProcura)) {
-//            response = given()
-//                    .accept("application/json")
-//                    .contentType("application/json")
-//                    .header("Authorization", "Bearer " + token)
-//                    .body(json)
-//                    .when()
-//                    .post(URL + "/playlists/" + idPlayList + "/tracks")
-//                    .then()
-//                    .extract()
-//                    .response();
-//            if (response.statusCode() != 401) {
-//                assertEquals(response.statusCode(), 201);
-//                buscaNomeMusicaRequest();
-//                list = response.path("items.track.name");
-//                assertTrue(verificaPorName(nomeMusciaProcura));
-//            } else {
-//                System.out.println("Usuário não está logado!");
-//            }
-//        }else {
-//                System.out.println("Música já cadastrada!");
-//            }
-//    }
-
     @Test
     public void deletaMusica()
     {
@@ -151,7 +127,6 @@ public class Treinamento {
             if (response.statusCode() != 401) {
                 assertEquals(response.statusCode(), 200);
                 buscaNomeMusicaRequest();
-//                list = response.path("items.track.name");
                 assertFalse(verificaPorName(nomeMusciaProcura));
             } else {
                 System.out.println("Usuário não está logado!");
@@ -159,14 +134,14 @@ public class Treinamento {
     }
 
     @Test
-    public void zalterarNomePlatList()
+    public void alterarDescricaoPlaytList()
     {
             retornaIdPlayList(nomePlayList);
             response = given()
                     .accept("application/json")
                     .contentType("application/json")
                     .header("Authorization", "Bearer " + token)
-                    .body("{\"name\":\"" + nomePlayListAlteracao + "\",\"description\":\"" + nomePlayListAlteracao + "\",\"public\":false}")
+                    .body("{\"description\":\"" + descricaoPlayListAlteracao  + "\"}")
                     .when()
                     .put(URL + "/playlists/" + idPlayList)
                     .then()
@@ -174,10 +149,7 @@ public class Treinamento {
                     .response();
             if (response.statusCode() != 401) {
                 assertEquals(response.statusCode(), 200);
-                buscaPlayListRequest();
-                list = response.path("items.name");
-                assertTrue(verificaPorName(nomePlayListAlteracao));
-                assertFalse(verificaPorName(nomePlayList));
+                assertEquals(buscaDadosPlayList(), descricaoPlayListAlteracao);
             } else {
                 System.out.println("Usuário não está logado!");
             }
@@ -211,8 +183,39 @@ public class Treinamento {
                 .response();
         if (response.statusCode() != 401) {
             assertEquals(response.statusCode(), 201);
-            buscaPlayListUsuarioRequest();
-            assertTrue(verificaPorName(nomeNovaPlayList));
+            idPlayList = response.path("id");
+            assertEquals(buscaDadosPlayList(), nomeNovaPlayList);
+        } else {
+            System.out.println("Usuário não está logado!");
+        }
+    }
+
+    @Test
+    public void reordenarPlayList()
+    {
+        retornaIdPlayList(nomePlayList);
+        buscaNomeMusicaRequest();
+        idMusicaPosicao = response.path("items[0].track.id");
+        nomeMusicPaosicao = response.path("items[0].track.name");
+        idMusicaPosicaoSegunda = response.path("items[1].track.id");
+        nomeMusicPaosicaoSegunda = response.path("items[1].track.name");
+        response = given()
+                .accept("application/json")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .body("{\"range_start\":0,\"range_length\":1,\"insert_before\":2}")
+                .when()
+                .put(URL + "/playlists/" + idPlayList + "/tracks")
+                .then()
+                .extract()
+                .response();
+        if (response.statusCode() != 401) {
+            assertEquals(response.statusCode(), 200);
+            buscaNomeMusicaRequest();
+            assertEquals(idMusicaPosicao, response.path("items[1].track.id"));
+            assertEquals(nomeMusicPaosicao, response.path("items[1].track.name"));
+            assertEquals(idMusicaPosicaoSegunda, response.path("items[0].track.id"));
+            assertEquals(nomeMusicPaosicaoSegunda, response.path("items[0].track.name"));
         } else {
             System.out.println("Usuário não está logado!");
         }
@@ -304,5 +307,51 @@ public class Treinamento {
             System.out.println("Música não encontrada!");
         }
     }
-}
 
+    public String buscaDadosPlayList()
+    {
+        response =  given()
+                .accept("application/json")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get(URL + "/playlists/" + idPlayList)
+                .then()
+                .extract()
+                .response();
+        if (response.statusCode() != 401) {
+           return response.path("description");
+        } else {
+            System.out.println("Usuário não está logado!");
+            return null;
+        }
+    }
+
+   @Test @Ignore("Usando arquivo JSON")
+    public void adicionaMusicaArquivoJson() {
+        File json = new File("src/arquivosJson/adicionarMusica.json");
+        retornaIdMusica(nomePlayList, nomeMuscia);
+        if(!verificaPorName(nomeMusciaProcura)) {
+            response = given()
+                    .accept("application/json")
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .body(json)
+                    .when()
+                    .post(URL + "/playlists/" + idPlayList + "/tracks")
+                    .then()
+                    .extract()
+                    .response();
+            if (response.statusCode() != 401) {
+                assertEquals(response.statusCode(), 201);
+                buscaNomeMusicaRequest();
+                list = response.path("items.track.name");
+                assertTrue(verificaPorName(nomeMusciaProcura));
+            } else {
+                System.out.println("Usuário não está logado!");
+            }
+        }else {
+                System.out.println("Música já cadastrada!");
+            }
+    }
+}
