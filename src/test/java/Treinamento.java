@@ -1,14 +1,17 @@
 import io.restassured.response.Response;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
-import java.io.File;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
+import io.restassured.http.ContentType;
+
 public class Treinamento {
     public LerArquivoJson lerArquivoJson = new LerArquivoJson();
-    public static String token = "BQAoemv6becodF5KWpdtJRpRVE-ECgUQHfc0E8EpKnjyXzmcJNvRwynAmp6MqH9tKAOTJ9dZ-8T9xh-3tLLJIkXVJ_BgOQi1emK7hyvQ8t4AtqxmfAmwjNHksEmdP3NurYZAywPDGzB1cXli_c-rcX1Yis31Tt3ZY-Xh3RaUtZFYuQ5Cgqv6ZEzh8xqT2bwvdQ4RVHly9bZOlzFJySxMUu66J1Igu_4-B2YzNJxVlRkHEQ2plzUa6uY4JCuY2qw1czQ8nypdmugjuodMgcCwSjQEazfwt37O3y-o5g";
+    public static String token = "BQC9uZbtzeVoof8Wy53cughlJz9O5M6XFv_Zy0uOyEgalwgrMpgGv_09l7k9sYCbJwBobmzLd05SNvciUaty0J125LuPDYbxWpcatnCKH5gL2543g0Rq4XSNtJy1N4OuQaSKhKawBXd6oF83e9cjehCb2d73lIZQgHMXHdWZsDwHeamlJx0y9HJaFEfCKVU66_7njjqNCluv6hjzJhS_FF9EIYz10hWL2W9m9M55B1BqiOWRZzYIf-2DzsKdrR3WghmHFMLR54LGHSteqHIWlcN4hO8ae5U9XjHZVw";
     public static String idUsuario = "31y365smpy5c5zy52kgzv7jrjk44";
     public static String URL = "https://api.spotify.com/v1";
     public static  String nomeMuscia = "Please Mr. Postman";
@@ -26,6 +29,23 @@ public class Treinamento {
     public static String idNomeMusica;
     public static ArrayList  list;
     public static int index;
+    public static String client_id = "507cc87c01f24b7ba331d3d616404eba";
+    public static String client_secret = "131c0d2189424c37ae0d39fdc55069ec";
+
+    @BeforeClass
+    public void gerarToken()
+    {
+        response = given()
+        .formParam("grant_type", "refresh_token")
+        .formParam("refresh_token", "AQC86RkjqfXwUCHcwF2hVWrzankEXqm7FGc6NdOdFBRgf3zhg49ZVwJDEcHXHL83tK1eUyVNWhbPKUBmGfwQ0PqmSqP2I77x3gNaeFxTu9dzHtk_W9DgPvfu7M4lZsqgM4Y")
+        .header("Authorization", "Basic NTA3Y2M4N2MwMWYyNGI3YmEzMzFkM2Q2MTY0MDRlYmE6MTMxYzBkMjE4OTQyNGMzN2FlMGQzOWZkYzU1MDY5ZWM=")
+        .post("https://accounts.spotify.com/api/token")
+        .then()
+        .extract()
+        .response() ;
+        assertEquals(response.statusCode(), 200);
+        token = response.path("access_token");
+    }
 
     @Test
     public void buscaPlayList()
@@ -114,6 +134,7 @@ public class Treinamento {
     public void deletaMusica()
     {
             retornaIdMusica(nomePlayList, nomeMusciaProcura);
+            int quantidadeMusica = list.size();
             response = given()
                     .accept("application/json")
                     .contentType("application/json")
@@ -128,6 +149,7 @@ public class Treinamento {
                 assertEquals(response.statusCode(), 200);
                 buscaNomeMusicaRequest();
                 assertFalse(verificaPorName(nomeMusciaProcura));
+               assertEquals(list.size(), quantidadeMusica -1);
             } else {
                 System.out.println("Usuário não está logado!");
             }
@@ -137,21 +159,26 @@ public class Treinamento {
     public void alterarDescricaoPlaytList()
     {
             retornaIdPlayList(nomePlayList);
-            response = given()
-                    .accept("application/json")
-                    .contentType("application/json")
-                    .header("Authorization", "Bearer " + token)
-                    .body("{\"description\":\"" + descricaoPlayListAlteracao  + "\"}")
-                    .when()
-                    .put(URL + "/playlists/" + idPlayList)
-                    .then()
-                    .extract()
-                    .response();
-            if (response.statusCode() != 401) {
-                assertEquals(response.statusCode(), 200);
-                assertEquals(buscaDadosPlayList(), descricaoPlayListAlteracao);
-            } else {
-                System.out.println("Usuário não está logado!");
+            if(!buscaDadosPlayList().equals(descricaoPlayListAlteracao)){
+                response = given()
+                        .accept("application/json")
+                        .contentType("application/json")
+                        .header("Authorization", "Bearer " + token)
+                        .body("{\"description\":\"" + descricaoPlayListAlteracao + "\"}")
+                        .when()
+                        .put(URL + "/playlists/" + idPlayList)
+                        .then()
+                        .extract()
+                        .response();
+                if (response.statusCode() != 401) {
+                    assertEquals(response.statusCode(), 200);
+                    assertEquals(buscaDadosPlayList(), descricaoPlayListAlteracao);
+                } else {
+                    System.out.println("Usuário não está logado!");
+                }
+            }
+            else {
+                System.out.println("Alteração já realizada!");
             }
     }
 
