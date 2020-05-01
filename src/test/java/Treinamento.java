@@ -1,4 +1,5 @@
 import io.restassured.response.Response;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
@@ -9,62 +10,32 @@ import static org.testng.Assert.*;
 
 import io.restassured.http.ContentType;
 
-public class Treinamento {
+public class Treinamento extends  Helper{
     public LerArquivoJson lerArquivoJson = new LerArquivoJson();
-    public static String token = "BQC9uZbtzeVoof8Wy53cughlJz9O5M6XFv_Zy0uOyEgalwgrMpgGv_09l7k9sYCbJwBobmzLd05SNvciUaty0J125LuPDYbxWpcatnCKH5gL2543g0Rq4XSNtJy1N4OuQaSKhKawBXd6oF83e9cjehCb2d73lIZQgHMXHdWZsDwHeamlJx0y9HJaFEfCKVU66_7njjqNCluv6hjzJhS_FF9EIYz10hWL2W9m9M55B1BqiOWRZzYIf-2DzsKdrR3WghmHFMLR54LGHSteqHIWlcN4hO8ae5U9XjHZVw";
     public static String idUsuario = "31y365smpy5c5zy52kgzv7jrjk44";
-    public static String URL = "https://api.spotify.com/v1";
     public static  String nomeMuscia = "Please Mr. Postman";
     public static  String nomeMusciaProcura = "Please Mister Postman - Remastered 2009";
     public static  String nomePlayList = "Teste Postman";
     public static  String nomeNovaPlayList = "Nova playList";
     public static String nameArtist = "The Marvelettes";
     public static  String descricaoPlayListAlteracao = "Teste Postman Novo";
-    public static Response response;
-    public static String idPlayList;
     public  static  String idMusicaPosicao;
     public static String nomeMusicPaosicao;
     public  static  String idMusicaPosicaoSegunda;
     public static String nomeMusicPaosicaoSegunda;
     public static String idNomeMusica;
-    public static ArrayList  list;
-    public static int index;
-    public static String client_id = "";
-    public static String client_secret = "";
+    public static BuscaPlayList buscaPlayList = new BuscaPlayList();
 
     @BeforeClass
-    public void gerarToken()
+    public void Login()
     {
-        response = given()
-        .formParam("grant_type", "refresh_token")
-        .formParam("refresh_token", "")
-        .header("Authorization", "Basic ")
-        .post("https://accounts.spotify.com/api/token")
-        .then()
-        .extract()
-        .response() ;
-        assertEquals(response.statusCode(), 200);
-        token = response.path("access_token");
-    }
-
-    @Test
-    public void buscaPlayList()
-    {
-        buscaPlayListRequest();
-        if(response.statusCode() != 401) {
-            assertEquals(response.statusCode(), 200, "PlayList não encontrada!");
-            assertTrue(verificaPorName(nomePlayList));
-        }
-        else
-        {
-            System.out.println("Usuário não está logado!");
-        }
+        gerarToken();
+        buscaPlayList.retornaIdPlayList(nomePlayList);
     }
 
     @Test
     public void buscaNomeMusica()
     {
-        retornaIdPlayList(nomePlayList);
         buscaNomeMusicaRequest();
         if(response.statusCode() != 401) {
             assertEquals(response.statusCode(), 200);
@@ -80,7 +51,7 @@ public class Treinamento {
     @Test
     public void buscaArtista()
     {
-        retornaIdMusica(nomePlayList, nomeMuscia);
+        retornaIdMusica(nomeMuscia);
         response =  given()
                 .accept("application/json")
                 .contentType("application/json")
@@ -104,7 +75,6 @@ public class Treinamento {
     @Test
     public void adicionaMusica()
     {
-        retornaIdMusica(nomePlayList, nomeMuscia);
         if(!verificaPorName(nomeMusciaProcura)){
             response = given()
                     .accept("application/json")
@@ -133,7 +103,7 @@ public class Treinamento {
     @Test
     public void deletaMusica()
     {
-            retornaIdMusica(nomePlayList, nomeMusciaProcura);
+            retornaIdMusica(nomeMusciaProcura);
             int quantidadeMusica = list.size();
             response = given()
                     .accept("application/json")
@@ -158,7 +128,6 @@ public class Treinamento {
     @Test
     public void alterarDescricaoPlaytList()
     {
-            retornaIdPlayList(nomePlayList);
             if(!buscaDadosPlayList().equals(descricaoPlayListAlteracao)){
                 response = given()
                         .accept("application/json")
@@ -197,7 +166,6 @@ public class Treinamento {
     @Test
     public void criarPlayListUsuario()
     {
-        retornaIdPlayList(nomePlayList);
         response = given()
                 .accept("application/json")
                 .contentType("application/json")
@@ -220,7 +188,6 @@ public class Treinamento {
     @Test
     public void reordenarPlayList()
     {
-        retornaIdPlayList(nomePlayList);
         buscaNomeMusicaRequest();
         idMusicaPosicao = response.path("items[0].track.id");
         nomeMusicPaosicao = response.path("items[0].track.name");
@@ -266,24 +233,6 @@ public class Treinamento {
         }
     }
 
-    public void buscaPlayListRequest()
-    {
-        response =  given()
-                .accept("application/json")
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + token)
-                .when()
-                .get(URL + "/me/playlists")
-                .then()
-                .extract()
-                .response();
-        if (response.statusCode() != 401) {
-             list = response.path("items.name");
-        } else {
-            System.out.println("Usuário não está logado!");
-        }
-    }
-
     public void buscaPlayListUsuarioRequest()
     {
         response = given()
@@ -302,31 +251,9 @@ public class Treinamento {
         }
     }
 
-    public Boolean verificaPorName(String nome) {
-        index = -1;
-        for (int i = 0; i < list.size(); i++) {
-            if(list.get(i).equals(nome))
-            {
-                index = i;
-                return  true;
-            }
-        }
-        return false;
-    }
-
-    public void retornaIdPlayList(String nomePlayList)
+    public void retornaIdMusica(String nomeMusica)
     {
-        buscaPlayListRequest();
-        if(verificaPorName(nomePlayList)){
-            idPlayList = response.path("items[" + index + "].id");
-        } else {
-            System.out.println("PlayList não encontrada!");
-        }
-    }
-
-    public void retornaIdMusica(String nomePlaList, String nomeMusica)
-    {
-        retornaIdPlayList(nomePlaList);
+        buscaPlayList.retornaIdPlayList(nomePlayList);
         buscaNomeMusicaRequest();
         if(verificaPorName(nomeMusica)) {
             idNomeMusica = response.path("items[" + index + "].track.id");
@@ -357,7 +284,7 @@ public class Treinamento {
    @Test @Ignore("Usando arquivo JSON")
     public void adicionaMusicaArquivoJson() {
         File json = new File("src/arquivosJson/adicionarMusica.json");
-        retornaIdMusica(nomePlayList, nomeMuscia);
+        retornaIdMusica(nomeMuscia);
         if(!verificaPorName(nomeMusciaProcura)) {
             response = given()
                     .accept("application/json")

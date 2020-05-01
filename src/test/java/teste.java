@@ -1,10 +1,11 @@
 import io.restassured.response.Response;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import java.util.ArrayList;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
+@Ignore
 public class teste {
     public static String token = "BQCWM8Cgr-wEuE3ib6VoWX3FqAlA3pywFbvn-wt7IVWoDyeJDWfuJ0sQMsIxmFkjxcv2mEM-cGO-e_7QsGIBDHxAv3p5-P0J1dVq9u8mHnQ0WGVvyJgItbqSxEE6aEd_UaXZRyeUfHIll1YRgUtjBhAI5HNNOB_j_-mvol1HW9tfqlepKxSv-KlXUdNkednD37za3WjQRfGOQCeOTMOdkROZ41h5Uv_jovgV1hMYsp2bvg0u7XZzHQZe-SvN7IWYry59EafPhb3SJ8aTAmoiFE4xClXV4j7YBKPhTA";
     public static String URL = "https://api.spotify.com/v1";
