@@ -18,7 +18,6 @@ public class BuscaPlayList extends Helper {
         } else {
             System.out.println("Usuário não está logado!");
             throw new SkipException("Usuário não está logado!");
-
         }
     }
 

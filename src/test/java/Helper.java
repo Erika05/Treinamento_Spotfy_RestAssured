@@ -1,8 +1,9 @@
 import io.restassured.response.Response;
-
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 import java.util.ArrayList;
 import java.util.Base64;
-
+import static  org.junit.Assert.assertThat;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.assertEquals;
 
@@ -13,8 +14,8 @@ public class Helper {
     public static  Response response;
     public static ArrayList list;
     public static  String idPlayList;
-    public static String client_id = "";
-    public static String client_secret = "";
+    public static String client_id = "507cc87c01f24b7ba331d3d616404eba";
+    public static String client_secret = "131c0d2189424c37ae0d39fdc55069ec";
 
 
     public void gerarToken()
@@ -30,6 +31,7 @@ public class Helper {
                 .extract()
                 .response() ;
         assertEquals(response.statusCode(), 200);
+        assertThat(response.statusCode(), anyOf(is(200), is(204)));
         token = response.path("access_token");
     }
 
@@ -42,5 +44,12 @@ public class Helper {
             }
         }
         return false;
+    }
+
+    public static void x() {
+        index = -1;
+        for (Object s : list) {
+           index++;
+        }
     }
 }
