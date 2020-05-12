@@ -1,16 +1,12 @@
-import io.restassured.response.Response;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 import java.io.*;
-import java.util.*;
+
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
-import io.restassured.http.ContentType;
-
-public class Treinamento extends  Helper{
+public class Musica extends  Helper{
     public LerArquivoJson lerArquivoJson = new LerArquivoJson();
     public static String idUsuario = "31y365smpy5c5zy52kgzv7jrjk44";
     public static  String nomeMuscia = "Please Mr. Postman";
@@ -24,7 +20,7 @@ public class Treinamento extends  Helper{
     public  static  String idMusicaPosicaoSegunda;
     public static String nomeMusicPaosicaoSegunda;
     public static String idNomeMusica;
-    public static BuscaPlayList buscaPlayList = new BuscaPlayList();
+    public static PlayList buscaPlayList = new PlayList();
 
     @BeforeClass
     public void Login()
@@ -40,7 +36,7 @@ public class Treinamento extends  Helper{
         if(response.statusCode() != 401) {
             assertEquals(response.statusCode(), 200);
             list = response.path("items.track.name");
-           assertTrue(verificaPorName(nomeMuscia));
+            assertTrue(verificaPorName(nomeMuscia));
         }
         else
         {
@@ -65,7 +61,7 @@ public class Treinamento extends  Helper{
             assertEquals(response.statusCode(), 200);
             list = response.path("artists.name");
             assertTrue(verificaPorName(nameArtist));
-    }
+        }
         else
         {
             System.out.println("Usuário não está logado!");
@@ -103,52 +99,52 @@ public class Treinamento extends  Helper{
     @Test
     public void deletaMusica()
     {
-            retornaIdMusica(nomeMusciaProcura);
-            int quantidadeMusica = list.size();
-            response = given()
-                    .accept("application/json")
-                    .contentType("application/json")
-                    .header("Authorization", "Bearer " + token)
-                    .body("{\"tracks\":[{\"uri\":\"spotify:track:6wfK1R6FoLpmUA9lk5ll4T\"}]}")
-                    .when()
-                    .delete(URL + "/playlists/" + idPlayList + "/tracks")
-                    .then()
-                    .extract()
-                    .response();
-            if (response.statusCode() != 401) {
-                assertEquals(response.statusCode(), 200);
-                buscaNomeMusicaRequest();
-                assertFalse(verificaPorName(nomeMusciaProcura));
-               assertEquals(list.size(), quantidadeMusica -1);
-            } else {
-                System.out.println("Usuário não está logado!");
-            }
+        retornaIdMusica(nomeMusciaProcura);
+        int quantidadeMusica = list.size();
+        response = given()
+                .accept("application/json")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + token)
+                .body("{\"tracks\":[{\"uri\":\"spotify:track:6wfK1R6FoLpmUA9lk5ll4T\"}]}")
+                .when()
+                .delete(URL + "/playlists/" + idPlayList + "/tracks")
+                .then()
+                .extract()
+                .response();
+        if (response.statusCode() != 401) {
+            assertEquals(response.statusCode(), 200);
+            buscaNomeMusicaRequest();
+            assertFalse(verificaPorName(nomeMusciaProcura));
+            assertEquals(list.size(), quantidadeMusica -1);
+        } else {
+            System.out.println("Usuário não está logado!");
+        }
     }
 
     @Test
     public void alterarDescricaoPlaytList()
     {
-            if(!buscaDadosPlayList().equals(descricaoPlayListAlteracao)){
-                response = given()
-                        .accept("application/json")
-                        .contentType("application/json")
-                        .header("Authorization", "Bearer " + token)
-                        .body("{\"description\":\"" + descricaoPlayListAlteracao + "\"}")
-                        .when()
-                        .put(URL + "/playlists/" + idPlayList)
-                        .then()
-                        .extract()
-                        .response();
-                if (response.statusCode() != 401) {
-                    assertEquals(response.statusCode(), 200);
-                    assertEquals(buscaDadosPlayList(), descricaoPlayListAlteracao);
-                } else {
-                    System.out.println("Usuário não está logado!");
-                }
+        if(!buscaDadosPlayList().equals(descricaoPlayListAlteracao)){
+            response = given()
+                    .accept("application/json")
+                    .contentType("application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .body("{\"description\":\"" + descricaoPlayListAlteracao + "\"}")
+                    .when()
+                    .put(URL + "/playlists/" + idPlayList)
+                    .then()
+                    .extract()
+                    .response();
+            if (response.statusCode() != 401) {
+                assertEquals(response.statusCode(), 200);
+                assertEquals(buscaDadosPlayList(), descricaoPlayListAlteracao);
+            } else {
+                System.out.println("Usuário não está logado!");
             }
-            else {
-                System.out.println("Alteração já realizada!");
-            }
+        }
+        else {
+            System.out.println("Alteração já realizada!");
+        }
     }
 
     @Test
@@ -274,14 +270,14 @@ public class Treinamento extends  Helper{
                 .extract()
                 .response();
         if (response.statusCode() != 401) {
-           return response.path("description");
+            return response.path("description");
         } else {
             System.out.println("Usuário não está logado!");
             return null;
         }
     }
 
-   @Test @Ignore("Usando arquivo JSON")
+    @Test @Ignore("Usando arquivo JSON")
     public void adicionaMusicaArquivoJson() {
         File json = new File("src/arquivosJson/adicionarMusica.json");
         retornaIdMusica(nomeMuscia);
@@ -305,7 +301,7 @@ public class Treinamento extends  Helper{
                 System.out.println("Usuário não está logado!");
             }
         }else {
-                System.out.println("Música já cadastrada!");
-            }
+            System.out.println("Música já cadastrada!");
+        }
     }
 }

@@ -14,8 +14,8 @@ public class Helper {
     public static  Response response;
     public static ArrayList list;
     public static  String idPlayList;
-    public static String client_id = "507cc87c01f24b7ba331d3d616404eba";
-    public static String client_secret = "131c0d2189424c37ae0d39fdc55069ec";
+    public static String client_id = "";
+    public static String client_secret = "";
 
 
     public void gerarToken()
@@ -24,7 +24,7 @@ public class Helper {
 
         response = given()
                 .formParam("grant_type", "refresh_token")
-                .formParam("refresh_token", "AQC86RkjqfXwUCHcwF2hVWrzankEXqm7FGc6NdOdFBRgf3zhg49ZVwJDEcHXHL83tK1eUyVNWhbPKUBmGfwQ0PqmSqP2I77x3gNaeFxTu9dzHtk_W9DgPvfu7M4lZsqgM4Y")
+                .formParam("refresh_token", "")
                 .header("Authorization", "Basic " + client_credentials)
                 .post("https://accounts.spotify.com/api/token")
                 .then()

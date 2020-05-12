@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="SuiteAll">
+
+    <!-- Suite testes-->
+    <test name="api_BMG: Autenticacao">
+        <classes>
+            <class name="Musica"/>
+            <class name="PlayList"/>
+        </classes>
+    </test>
+</suite>
