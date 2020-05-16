@@ -1,3 +1,4 @@
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
@@ -144,6 +145,7 @@ public class Musica extends  Helper{
         }
         else {
             System.out.println("Alteração já realizada!");
+            throw new SkipException("Alteração já realizada!");
         }
     }
 
